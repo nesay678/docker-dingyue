@@ -229,7 +229,7 @@ process_subscription() {
      if [[ "$url" == "vmess://"* ]]; then
          if [ -n "${CF_IP1}" ]; then
         encoded_url="${url#vmess://}"
-        decoded_url=$(echo "$encoded_url" | base64 --decode)
+        decoded_url=$(echo "$encoded_url" | base64 -d)
         modified_url="${decoded_url//anycast.cf.030419.xyz/$CF_IP1}"
         modified_url="${modified_url//ip.sb/$CF_IP1}"
         echo "Modified URL: $modified_url"
