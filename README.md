@@ -1,6 +1,6 @@
 # docker-dingyue
 
-使用说明看仓库shuoming.html
+使用说明看仓库shuoming.html，用浏览器打开查看
 
 镜像:daxia2023/sub:latest
 
