@@ -226,16 +226,19 @@ process_subscription() {
         IFS=";" read -ra urls <<< "$xray_subscriptions"
         for url in "${urls[@]}"
         do
-         if [[ "$url" == "vmess://"* ]]; then
-              if [ -n "${CF_IP1}" ]; then
-              encoded_url="${url#vmess://}"
-              decoded_url=$(echo "$encoded_url" | base64 --decode)
-               modified_url="${decoded_url//YOUXUAN_IP/$CF_IP1}"
-               modified_url="${modified_url//ip.sb/$CF_IP1}"
-               re_encoded_url=$(echo "$modified_url" | base64)
-               url="vmess://$re_encoded_url"
-               fi
-               echo "${url}" >> "/app/tmp${output_file}"
+     if [[ "$url" == "vmess://"* ]]; then
+         if [ -n "${CF_IP1}" ]; then
+        encoded_url="${url#vmess://}"
+        decoded_url=$(echo "$encoded_url" | base64 --decode)
+        modified_url="${decoded_url//anycast.cf.030419.xyz/$CF_IP1}"
+        modified_url="${modified_url//ip.sb/$CF_IP1}"
+        echo "Modified URL: $modified_url"
+        re_encoded_url=$(echo -n "$modified_url" | base64 -w 0)
+        new_url="vmess://$re_encoded_url"
+        echo "${new_url}" >> "/app/tmp${output_file}"
+         else
+          echo "${url}" >> "/app/tmp${output_file}"
+          fi
           elif [[ "$url" == "https://"* || "$url" == "http://"* ]]; then         
                 local subscription_content=$(curl -s -m 10 "$url")
                 if [ -n "$subscription_content" ]; then
@@ -253,9 +256,10 @@ process_subscription() {
             fi
         done
         if [ -n "${CF_IP1}" ]; then
-            sed -i 's#YOUXUAN_IP#${CF_IP1}#g' "/app/tmp${output_file}"
-            sed -i 's#ip.sb#${CF_IP1}#g' "/app/tmp${output_file}"
+         sed -i "s#YOUXUAN_IP#${CF_IP1}#g" "/app/tmp${output_file}"
+         sed -i "s#ip.sb#${CF_IP1}#g" "/app/tmp${output_file}"
         fi
+
         if [ -n "$SPACE_HOST" ]; then
         echo "${V_URL}" >> "/app/tmp${output_file}"
         fi
