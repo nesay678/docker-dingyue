@@ -1,9 +1,8 @@
 #!/bin/bash
-
 # ===========================================设置相关参数=============================================
 FLIE_PATH="/app/"
 #设置参数
-export SUB_KEY=${NEZHA_KEY:-'key123456'}
+SUB_KEY=${NEZHA_KEY:-'key123456'}
 NEZHA_PORT=${NEZHA_PORT:-'443'}
 NEZHA_TLS=${NEZHA_TLS:-'1'}
 
@@ -67,9 +66,7 @@ else
    [ -s ${FLIE_PATH}argo.log  ] && rm -rf ${FLIE_PATH}argo.log
    nohup ${FLIE_PATH}cff.js tunnel --edge-ip-version auto --no-autoupdate --protocol http2 --logfile ${FLIE_PATH}argo.log --loglevel info --url http://localhost:8002 2>/dev/null 2>&1 &
    sleep 10
-
   [ -s ${FLIE_PATH}argo.log ] && export ARGO_DOMAIN=$(cat ${FLIE_PATH}argo.log | grep -o "info.*https://.*trycloudflare.com" | sed "s@.*https://@@g" | tail -n 1)
-
   fi
  fi
   fi
@@ -83,7 +80,6 @@ sed -i 's#\${VPATH}#'"${VPATH}"'#g' ${FLIE_PATH}nginx.conf
 sed -i 's#\${MPATH}#'"${MPATH}"'#g' ${FLIE_PATH}nginx.conf
 sed -i 's#\${NEZHA_KEY}#'"${NEZHA_KEY}"'#g' ${FLIE_PATH}nginx.conf
 sed -i 's#\${SERVER_PORT}#'"${SERVER_PORT}"'#g' ${FLIE_PATH}nginx.conf
-cp -rf ${FLIE_PATH}ADSTERTRN6456Q65525421Q3ASFDA321.html ${FLIE_PATH}${UUID}.html
 cp -rf ${FLIE_PATH}nginx.conf /etc/nginx/nginx.conf
 nohup nginx -g 'daemon off;' >/dev/null 2>&1 &
 }
@@ -102,24 +98,16 @@ if [ -n "$SPACE_HOST" ]; then
     export ARGO_DOMAIN=$SPACE_HOST
     export URL_HOST="https://$SPACE_HOST"
 else
-    export URL_HOST="空间网址"
+    export URL_HOST="网址"
 fi
 run_app
 run_nginx
 # ===================================
-[ "$RIZHI" = "yes" ] && echo "                                                 "
 [ "$RIZHI" = "yes" ] && echo "***************************************************"
-[ "$RIZHI" = "yes" ] && echo "       ${URL_HOST}/${UUID}2 查看使用说明               "
 [ "$RIZHI" = "yes" ] && echo "                                                 "
+[ "$RIZHI" = "yes" ] && echo "       ${URL_HOST}/upload-${UUID} 节点上传地址               "
 [ "$RIZHI" = "yes" ] && echo "                                                 "
-[ "$RIZHI" = "yes" ] && echo "       ${URL_HOST}/upload-${UUID} 订阅上传地址               "
-[ "$RIZHI" = "yes" ] && echo "                                                 "
-
 [ "$RIZHI" = "yes" ] && echo "       ${URL_HOST}/sub2-${NEZHA_KEY} 订阅地址               "
-[ "$RIZHI" = "yes" ] && echo "                                                 "
-[ "$RIZHI" = "yes" ] && echo "       ${URL_HOST}/info 系统信息               "
-[ "$RIZHI" = "yes" ] && echo "                                                 "
-[ "$RIZHI" = "yes" ] && echo "       ${URL_HOST}/listen 监听端口               "
 [ "$RIZHI" = "yes" ] && echo "                                                 "
 [ "$RIZHI" = "yes" ] && echo "***************************************************"
 
@@ -267,7 +255,7 @@ process_subscription() {
         sed -i 's/{PASS}-//g' "/app/tmp${output_file}"
         sed -i 's#{PASS}#vless#g' "/app/tmp${output_file}"
         # 对合并后的订阅内容进行Base64编码
-        local encoded_merged_subscription=$(cat "/app/tmp${output_file}" | base64)
+        local encoded_merged_subscription=$(cat "/app/tmp${output_file}" | base64 -w 0)
         echo -e "$encoded_merged_subscription" > "/app/${output_file}"
         rm -rf "/app/tmp${output_file}"
         echo "$1 订阅已更新于 $(date)"
@@ -352,19 +340,13 @@ if [[ -z "${TOK}" && -z "${CF_DOMAIN}" ]]; then
   [ -s ${FLIE_PATH}argo.log ] && export ARGO_DOMAIN=$(cat ${FLIE_PATH}argo.log | grep -o "info.*https://.*trycloudflare.com" | sed "s@.*https://@@g" | tail -n 1)
 fi
 V_URL="{PASS}://${UUID}@${CF_IP}:443?host=${ARGO_DOMAIN}&path=%2F${VPATH}%3Fed%3D2048&type=ws&encryption=none&security=tls&sni=${ARGO_DOMAIN}#${SUB_NAME}"
-
 RESPONSE=$(curl -s http://localhost:${SERVER_PORT}/get-${UUID})
-
-
 if [ $? -ne 0 ]; then
   echo "Curl request failed. Exiting."
 fi
-
-
 if [ -z "$RESPONSE" ]; then
   echo "Empty response received. Exiting."
 fi
-
 export SUB=$(echo "$RESPONSE" | jq -r '.urls[]' 2>/dev/null | paste -s -d ';')
 export SUB_12=""
 vars=("$SUB" "$SUB2")
