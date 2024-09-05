@@ -1,8 +1,10 @@
 # docker-dingyue
 
-使用说明看仓库shuoming.html，用浏览器打开查看
-
 镜像:daxia2023/sub:latest
+
+默认端口8080
+
+参数说明看仓库shuoming.html，用浏览器打开查看
 
 最好拉取制作自己私库，防止都用同一个
 
