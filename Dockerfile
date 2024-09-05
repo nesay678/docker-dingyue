@@ -1,4 +1,4 @@
-FROM daxia2023/doc:sub2
+FROM daxia2023/sub:latest
 
 ENV PORT=8080
 
